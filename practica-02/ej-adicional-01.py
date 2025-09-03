@@ -4,16 +4,18 @@
 from machine import Pin
 from machine import PWM
 
-led = Pin(25, Pin.OUT)
+from machine import Pin # Board IO Pin
+from machine import Timer # Hardware timer
 
-max_duty = 65535
+led = Pin(25, Pin.OUT) # Setup pin 25 (sentinel LED) as output
+led_pwm = PWM(led)
+duty_step = 129
 
-led_pwm = PWM(led, freq = 200);
+led_pwm.freq (5000)
+led_pwm.duty_u16(65000)
 
-duty_cycle = 100
 
-led_pwm.duty_u16(int((max_duty * duty_cycle)/100)) #Ciclo de trabajo del 50%
+for duty_cycle in range(65536, 0, -duty_step):
+    led_pwm.duty_u16(duty_cycle)
+    sleep_ms(5)
 
-duty = led_pwm.duty_u16()
-
-print(f'duty: \t {duty}') 
