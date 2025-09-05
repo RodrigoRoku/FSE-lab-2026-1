@@ -26,8 +26,8 @@ while True: # Bucle infinito
 	print(pines[index])                   #Para fines de debugging
 	index = index + 1
   #Revisa si se llegò al final del arreglo y reinicializa el ìndice
-  if index >= len(pines):
-    index = 0
+	if index >= len(pines):
+		index = 0
 	sleep(speed)  
 	if index != 0:
 		GPIO.output(pines[index - 1], GPIO.LOW)

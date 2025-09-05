@@ -23,9 +23,9 @@ while True: # Bucle infinito
 	GPIO.output(pines[index], GPIO.HIGH)  # Enciende el primer led
 	print(pines[index])                   #Para fines de debugging
 	index = index + 1
-  #Revisa si se llegò al final del arreglo y reinicializa el ìndice
-  if index >= len(pines):
-    index = 0
+  	#Revisa si se llegò al final del arreglo y reinicializa el ìndice
+	if index >= len(pines):
+		index = 0
 	sleep(0.5)         #Espera 500 ms
 	if index != 0:
 		GPIO.output(pines[index - 1], GPIO.LOW)

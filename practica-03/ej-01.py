@@ -21,7 +21,8 @@ for n in pines:
 while True: # Bucle infinito
 	sleep(0.5)                 # Espera 500ms
 	for n in pines:
-    GPIO.output(n, GPIO.HIGH) # Enciende todos los leds del arreglo
+    		GPIO.output(n, GPIO.HIGH) # Enciende todos los leds del arreglo
+	sleep(0.5)
 	for n in pines:                 # Espera 500ms
-    GPIO.output(n, GPIO.LOW)  # Apaga todos los leds del arreglo
+   		GPIO.output(n, GPIO.LOW)  # Apaga todos los leds del arreglo
 
