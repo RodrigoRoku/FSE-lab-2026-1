@@ -6,6 +6,7 @@
 import RPi.GPIO as GPIO
 # Importa la función sleep del módulo time
 from time import sleep
+import threading
 
 # Desactivar advertencias (warnings)
 GPIO.setwarnings(False)
@@ -20,17 +21,36 @@ for n in pines:
 
 # El siguiente código hace parpadear el led
 index = 0 #Indice para recorrer el arreglo
-speed = int(input("ingrese la velocidad en [ms]:"))/1000
-while True: # Bucle infinito
-	GPIO.output(pines[index], GPIO.HIGH)  # Enciende el primer led
-	print(pines[index])                   #Para fines de debugging
-	index = index + 1
-  #Revisa si se llegò al final del arreglo y reinicializa el ìndice
-	if index >= len(pines):
-		index = 0
-	sleep(speed)  
-	if index != 0:
-		GPIO.output(pines[index - 1], GPIO.LOW)
-	else:
-		GPIO.output(pines[len(pines)-1], GPIO.LOW)
+speed = 0.5
+
+def marquesina(speed):
+	while True: # Bucle infinito
+		GPIO.output(pines[index], GPIO.HIGH)  # Enciende el primer led
+		print(pines[index])                   #Para fines de debugging
+		index = index + 1
+		#Revisa si se llegò al final del arreglo y reinicializa el ìndice
+		if index >= len(pines):
+			index = 0
+		sleep(speed)  
+		if index != 0:
+			GPIO.output(pines[index - 1], GPIO.LOW)
+		else:
+			GPIO.output(pines[len(pines)-1], GPIO.LOW)
+
+def entrada_velocidad():
+	global speed
+	while True:
 		speed = int(input("ingrese la velocidad en [ms]:"))/1000
+
+t1 = threading.Thread(target=marquesina(speed))
+t2 = threading.Thread(target=entrada_velocidad)
+
+t1.start()
+t2.start()
+
+t1.join()
+t2.join()
+
+GPIO.cleanup()
+
+		
