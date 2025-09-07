@@ -14,7 +14,7 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 
 pines = [ 12, 16, 18, 22, 31,  33, 32]
-pines.reverse(); #Cambia el sentido en que se recorre el arreglo
+#pines.reverse(); #Cambia el sentido en que se recorre el arreglo
 #Inicializaciòn de pines, todos en estado BAJO (apagados)
 for n in pines:
 	GPIO.setup(n, GPIO.OUT, initial=GPIO.LOW)
@@ -23,7 +23,7 @@ for n in pines:
 #index = 0 #Indice para recorrer el arreglo
 speed = 0.5
 
-def corrimientoLeds():
+def marquesina():
 	index = 0
 	while True: # Bucle infinito
 		GPIO.output(pines[index], GPIO.HIGH)  # Enciende el primer led
@@ -36,14 +36,14 @@ def corrimientoLeds():
 		if index != 0:
 			GPIO.output(pines[index - 1], GPIO.LOW)
 		else:
-			GPIO.output(pines[len(pines)-1], GPIO.LOW)
+			pines.reverse()
 
 def entrada_velocidad():
 	global speed
 	while True:
 		speed = int(input("ingrese la velocidad en [ms]:"))/1000
 
-t1 = threading.Thread(target=corrimientoLeds )
+t1 = threading.Thread(target=marquesina)
 t2 = threading.Thread(target=entrada_velocidad)
 
 t1.start()
