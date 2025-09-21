@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Panel de Control LED - Raspberry Pi</title>
+	<meta charset="ISO-8859-1"/>
+	<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+	<header><h1>Panel de Control LED</h1></header>
+	<section class="container">
+		<article class="column">
+			<header><h2>Leds</h2></header>
+			<section class="container ledstrip">
+				<button id="led" class="ledbutton" onclick="handle(this, 'led', 1)">1</button>
+				<button id="led" class="ledbutton" onclick="handle(this, 'led', 2)">2</button>
+				<button id="led" class="ledbutton" onclick="handle(this, 'led', 3)">3</button>
+				<button id="led" class="ledbutton" onclick="handle(this, 'led', 4)">4</button>
+				<button id="led" class="ledbutton" onclick="handle(this, 'led', 5)">5</button>
+				<button class="ledbutton" onclick="handle(this, 'led', 6)">6</button>
+				<button class="ledbutton" onclick="handle(this, 'led', 7)">7</button>
+			</section>
+			<button class="widebutton" onclick="handle(this, 'marquee', 'left')">Marquesina Izq.</button>
+			<button class="widebutton" onclick="handle(this, 'marquee', 'right')">Marquesina Der.</button>
+			<button class="widebutton" onclick="handle(this, 'marquee', 'pingpong')">Ping-pong</button>
+		</article>
+		<article class="column">
+			<header><h2>Display</h2></header>
+			<section class="container numpad">
+				<button class="numbutton" onclick="handle(this, 'numpad', 7)">7</button>
+				<button class="numbutton" onclick="handle(this, 'numpad', 8)">8</button>
+				<button class="numbutton" onclick="handle(this, 'numpad', 9)">9</button>
+				<button class="numbutton" onclick="handle(this, 'numpad', 4)">4</button>
+				<button class="numbutton" onclick="handle(this, 'numpad', 5)">5</button>
+				<button class="numbutton" onclick="handle(this, 'numpad', 6)">6</button>
+				<button class="numbutton" onclick="handle(this, 'numpad', 1)">1</button>
+				<button class="numbutton" onclick="handle(this, 'numpad', 2)">2</button>
+				<button class="numbutton" onclick="handle(this, 'numpad', 3)">3</button>
+				<div class="numbutton" ></div>
+				<button class="numbutton" onclick="handle(this, 'numpad', 0)">0</button>
+				<div class="numbutton" ></div>
+			</section>
+		</article>
+	</section>
+</body>
+<script src="scripts.js"></script>
+</html>
