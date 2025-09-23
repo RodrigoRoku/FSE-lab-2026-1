@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Panel de Control LED - Raspberry Pi (simulado)</title>
+  <style>
+    html,body{margin:0;padding:0;width:100vw;height:100vh;box-sizing:border-box;}
+    body{max-width:800px;margin:0 auto;font-family:Arial, sans-serif;}
+    header{text-align:center;padding:1em 0;}
+    .container{display:flex;gap:1em;}
+    .column{flex:1;display:flex;flex-direction:column;align-items:center;}
+    .ledstrip{display:flex;justify-content:space-evenly;width:100%;padding:0.5em;}
+    .ledbutton{width:3.5em;height:3.5em;border-radius:50%;border:none;background:#933;color:#f00;box-shadow:0 4px 5px rgba(0,0,0,0.2);}
+    .ledbutton.on{background:#3f3;color:#0f0;}
+    .widebutton{width:90%;padding:0.6em;margin:0.25em 0;font-size:16px;}
+    .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:0.2em;padding:0.5em;background:#333;border-radius:6px;}
+    .numbutton{padding:0.6em;font-size:18pt;background:#fff;border:none;border-radius:4px;}
+    .numbutton.on{background:#3f3;color:#050;}
+    .controls{width:90%;margin-top:0.5em;text-align:center;}
+  </style>
+</head>
+<body>
+  <header><h1>Panel de Control LED (simulado)</h1></header>
+
+  <section class="container">
+    <article class="column">
+      <h2>Leds</h2>
+      <section class="ledstrip" id="ledStrip">
+        <button class="ledbutton" data-led="1" id="led-1" onclick="handle(this,'led',1)">1</button>
+        <button class="ledbutton" data-led="2" id="led-2" onclick="handle(this,'led',2)">2</button>
+        <button class="ledbutton" data-led="3" id="led-3" onclick="handle(this,'led',3)">3</button>
+        <button class="ledbutton" data-led="4" id="led-4" onclick="handle(this,'led',4)">4</button>
+        <button class="ledbutton" data-led="5" id="led-5" onclick="handle(this,'led',5)">5</button>
+        <button class="ledbutton" data-led="6" id="led-6" onclick="handle(this,'led',6)">6</button>
+        <button class="ledbutton" data-led="7" id="led-7" onclick="handle(this,'led',7)">7</button>
+      </section>
+
+      <div class="controls">
+        <button class="widebutton" id="marq-left" onclick="handle(this,'marquee','left')">Marquesina Izq.</button>
+        <button class="widebutton" id="marq-right" onclick="handle(this,'marquee','right')">Marquesina Der.</button>
+        <button class="widebutton" id="marq-pingpong" onclick="handle(this,'marquee','pingpong')">Ping-pong</button>
+      </div>
+    </article>
+
+    <article class="column">
+      <h2>Display</h2>
+      <section class="numpad" id="numpad">
+        <button class="numbutton" data-num="7" onclick="handle(this,'numpad',7)">7</button>
+        <button class="numbutton" data-num="8" onclick="handle(this,'numpad',8)">8</button>
+        <button class="numbutton" data-num="9" onclick="handle(this,'numpad',9)">9</button>
+        <button class="numbutton" data-num="4" onclick="handle(this,'numpad',4)">4</button>
+        <button class="numbutton" data-num="5" onclick="handle(this,'numpad',5)">5</button>
+        <button class="numbutton" data-num="6" onclick="handle(this,'numpad',6)">6</button>
+        <button class="numbutton" data-num="1" onclick="handle(this,'numpad',1)">1</button>
+        <button class="numbutton" data-num="2" onclick="handle(this,'numpad',2)">2</button>
+        <button class="numbutton" data-num="3" onclick="handle(this,'numpad',3)">3</button>
+        <div></div>
+        <button class="numbutton" data-num="0" onclick="handle(this,'numpad',0)">0</button>
+        <div></div>
+      </section>
+    </article>
+  </section>
+
+<script>
+/* Enviar POST al servidor */
+function sendPost(obj){
+  try {
+    fetch(window.location.href, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(obj)
+    }).catch(e => console.log("POST error:", e));
+  } catch(e) {
+    console.log(e);
+  }
+}
+
+function handle(sender, action, value){
+  sendPost({action: action, value: value});
+}
+
+/* Polling para obtener el estado actual del servidor */
+async function pollState(){
+  try {
+    let r = await fetch('/state');
+    if (!r.ok) return;
+    let s = await r.json();
+    updateUI(s);
+  } catch(e){
+    // console.debug("poll error", e);
+  }
+}
+
+function updateUI(s){
+  // leds
+  document.querySelectorAll('.ledbutton').forEach(btn=>{
+    const idx = Number(btn.dataset.led) - 1;
+    const on = s.leds && s.leds[idx];
+    if (on) btn.classList.add('on'); else btn.classList.remove('on');
+  });
+
+  // marquesina: resaltar botón activo
+  ['left','right','pingpong'].forEach(m=>{
+    const el = document.getElementById('marq-' + (m==='pingpong' ? 'pingpong' : m));
+    if (!el) return;
+    if (s.marquee_mode === m) el.classList.add('on'); else el.classList.remove('on');
+  });
+
+  // numpad: resaltar último pulsado
+  document.querySelectorAll('.numbutton').forEach(nb => nb.classList.remove('on'));
+  if (s.last_numpad !== null && s.last_numpad !== undefined){
+    const el = document.querySelector('.numbutton[data-num="'+ s.last_numpad +'"]');
+    if (el) el.classList.add('on');
+  }
+}
+
+/* arrancar polling */
+setInterval(pollState, 120); // cada 120 ms
+pollState(); // primera lectura inmediata
+</script>
+</body>
+</html>
