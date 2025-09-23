@@ -54,7 +54,7 @@ class gpioManager:
 	"""
 	def leds(self, num):
 		self.turnOffLeds()
-		GPIO.output(self.ledsLeft[num-1], GPIO.HIGH)
+		GPIO.output(self.ledsRight[num-1], GPIO.HIGH)
 		#Para que no se siga llamando a la función.
 		self.functionName = None
 		self.functionArgument = None
