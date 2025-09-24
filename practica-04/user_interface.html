@@ -206,7 +206,7 @@ function submit(action, value){
 
 async function pollState(){
   try {
-    let r = await fetch('http://192.168.100.46/state');
+    let r = await fetch('http://192.168.1.254/state');
 		console.log(r);
     if (!r.ok) return;
     let s =  await r.json();
