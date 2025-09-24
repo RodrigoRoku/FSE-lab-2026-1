@@ -139,24 +139,32 @@
 				<button id="led" class="ledbutton" onclick="handle(this, 'led', 6)">6</button>
 				<button id="led" class="ledbutton" onclick="handle(this, 'led', 7)">7</button>
 			</section>
-			<button id="mleft"  class="widebutton" onclick="handle(this, 'marquee', 'left')">Marquesina Izq.</button>
-			<button id="mright" class="widebutton" onclick="handle(this, 'marquee', 'right')">Marquesina Der.</button>
-			<button id="pingpong" class="widebutton" onclick="handle(this, 'marquee', 'pingpong')">Ping-pong</button>
+			<div class="controls">
+        <button class="widebutton" id="marq-left" onclick="handle(this,'marquee','left')">Marquesina Izq.</button>
+        <button class="widebutton" id="marq-right" onclick="handle(this,'marquee','right')">Marquesina Der.</button>
+        <button class="widebutton" id="marq-pingpong" onclick="handle(this,'marquee','pingpong')">Ping-pong</button>
+
+        <div style="margin-top:0.6em;">
+          <div class="labelSmall">Velocidad marquesina: <span id="speedValue">300</span> ms</div>
+          <input id="speedRange" type="range" min="50" max="1000" step="10" value="300"
+                 oninput="onSpeedChange(this.value)">
+        </div>
+      </div>
 		</article>
 		<article class="column">
 			<header><h2>Display</h2></header>
 			<section class="container numpad">
-				<button class="numbutton" onclick="handle(this, 'numpad', 7)">7</button>
-				<button class="numbutton" onclick="handle(this, 'numpad', 8)">8</button>
-				<button class="numbutton" onclick="handle(this, 'numpad', 9)">9</button>
-				<button class="numbutton" onclick="handle(this, 'numpad', 4)">4</button>
-				<button class="numbutton" onclick="handle(this, 'numpad', 5)">5</button>
-				<button class="numbutton" onclick="handle(this, 'numpad', 6)">6</button>
-				<button class="numbutton" onclick="handle(this, 'numpad', 1)">1</button>
-				<button class="numbutton" onclick="handle(this, 'numpad', 2)">2</button>
-				<button class="numbutton" onclick="handle(this, 'numpad', 3)">3</button>
+				<button id="7" class="numbutton" onclick="handle(this, 'numpad', 7)">7</button>
+				<button id="8" class="numbutton" onclick="handle(this, 'numpad', 8)">8</button>
+				<button id="9" class="numbutton" onclick="handle(this, 'numpad', 9)">9</button>
+				<button id="4" class="numbutton" onclick="handle(this, 'numpad', 4)">4</button>
+				<button id="5" class="numbutton" onclick="handle(this, 'numpad', 5)">5</button>
+				<button id="6" class="numbutton" onclick="handle(this, 'numpad', 6)">6</button>
+				<button id="1" class="numbutton" onclick="handle(this, 'numpad', 1)">1</button>
+				<button id="2" class="numbutton" onclick="handle(this, 'numpad', 2)">2</button>
+				<button id="3" class="numbutton" onclick="handle(this, 'numpad', 3)">3</button>
 				<div class="numbutton" ></div>
-				<button class="numbutton" onclick="handle(this, 'numpad', 0)">0</button>
+				<button id="0" class="numbutton" onclick="handle(this, 'numpad', 0)">0</button>
 				<div class="numbutton" ></div>
 			</section>
 		</article>
@@ -165,14 +173,7 @@
 </html>
 <script language="javascript">
 <!--
-function deactivateAll(){
-	//var buttons = document.getElementsByTagName('button');
-	var buttons = document.querySelectorAll('button');
-  console.log(buttons.length)
-  for(let i = 0; i < buttons.length; i++){
-		buttons[i].classList.remove("on")
-  }
-}
+
 
 function activate(sender){
 	if(sender == null)
@@ -181,9 +182,16 @@ function activate(sender){
 }
 
 function handle(sender, action, value){
-	deactivateAll();
-	activate(sender);
 	submit(action, value);
+	pollState()
+}
+
+/* slider velocidad */
+function onSpeedChange(val){
+  document.getElementById('speedValue').innerText = val;
+	submit('speed', Number(val))
+	pollState();
+	// sendPost({action: 'set_speed', value: Number(val)});
 }
 
 function submit(action, value){
@@ -195,5 +203,146 @@ function submit(action, value){
 		'value' :  value,
 	}));
 }
+
+async function pollState(){
+  try {
+    let r = await fetch('http://192.168.100.46/state');
+		console.log(r);
+    if (!r.ok) return;
+    let s =  await r.json();
+		updateUI(s);
+  } catch(e){
+    console.debug("poll error", e);
+  }
+}
+
+function updateUI(data){
+
+	//leds
+	if(data.led_animation == "None"){
+		clearMarquee();
+		ledStateArray = data.led_status.split("");
+		let leds = document.querySelectorAll('[id=led]');
+		for(let i = 0; i < leds.length; i++){
+			if(ledStateArray[i]=="1"){
+				leds[i].classList.add("on");
+			}else{
+				leds[i].classList.remove("on");
+			}
+		}
+	}else{
+		clearMarquee();
+		deactivateleds();
+		if(data.led_status == "left")
+			marqueeLeft(data.speed * 1000);
+		else if(data.led_status == "right")
+			marqueeRight(data.speed * 1000);
+		else
+			pingPong(data.speed * 1000);
+	}
+	
+	//Para el numpad
+	clearNumpad();
+	let numpad = document.getElementById(data.bcd);
+	numpad.classList.add("on");
+
+	//Para el slider de velocidad
+	let slider = document.getElementById("speedRange");
+	console.log(slider.value);
+	slider.value = data.speed * 1000;
+	document.getElementById('speedValue').innerText = data.speed * 1000;
+	console.log(slider.value);
+
+
+}
+
+var marquee = null;
+
+function deactivateleds(){
+	//var buttons = document.getElementsByTagName('button');
+	var buttons = document.querySelectorAll('[id=led]');
+  for(let i = 0; i < buttons.length; i++){
+		buttons[i].classList.remove("on")
+  }
+}
+
+function clearMarquee(){
+	console.log(marquee)
+	if(typeof(marquee) != "undefined" && marquee !== null){
+		clearInterval(marquee)
+		marquee = null
+	}
+}
+function clearNumpad(){
+	var buttons = document.querySelectorAll('.numbutton');
+	console.log(buttons);
+  for(let i = 0; i < buttons.length; i++){
+		buttons[i].classList.remove("on")
+  }
+}
+function marqueeRight(speed){
+	var buttons = document.querySelectorAll('[id=led]');
+	var i = 0;
+	marquee =  setInterval(() => {
+		//console.log("Mensaje cada 0.5 seg")
+		buttons[i].classList.add("on");
+		console.log(i);
+		if(i > 0){
+			buttons[i - 1].classList.remove("on");
+		}else{
+			buttons[buttons.length - 1].classList.remove("on");
+		}
+		i = i + 1 ;
+		if(i >= buttons.length){
+			i = 0;
+		}
+	}, speed)
+
+}
+
+function marqueeLeft(speed){
+	var buttons = document.querySelectorAll('[id=led]');
+	var i = buttons.length - 1;
+	marquee =  setInterval(() => {
+		buttons[i].classList.add("on");
+		console.log(i);
+		if(i < buttons.length - 1){
+			buttons[i + 1].classList.remove("on");
+		}else{
+			buttons[0].classList.remove("on");
+		}
+		i-- ;
+		if(i < 0){
+			i = buttons.length - 1;
+		}
+	}, speed)
+
+}
+
+function pingPong(speed){
+	var buttons = document.querySelectorAll('[id=led]');
+	var i = 0;
+	var inc = 1;
+	marquee =  setInterval(() => {
+		
+		if(i >= buttons.length || i < 0){
+			i = i - inc
+			inc = inc * (-1)
+		}else{
+			if(i !== 0)
+				buttons[i-inc].classList.remove("on");
+			else
+				buttons[1].classList.remove("on");
+		}
+		buttons[i].classList.add("on");
+		console.log(i);
+		i = i + inc;
+
+	}, speed)
+
+}
+pollState();
+
+
 //-->
 </script>

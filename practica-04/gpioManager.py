@@ -12,7 +12,7 @@ from time import sleep
 
 
 class gpioManager:
-	speed = 0.5 #Para funciones de retardo
+	
 	def __init__(self):
 		print("construyendo el objeto")
 		#VAriables para controlar los bucles dentro de las funciones
@@ -31,6 +31,8 @@ class gpioManager:
 		self.ledsRight = [ 12, 16, 18, 22, 31,  33, 32]
 		self.ledsLeft = [32, 33, 31, 22 ,18 ,16, 12]
 		self.pinesBcd = [36, 38, 40 ,37]
+		self.bcdValue = 0
+		self.speed = 0.5 #Para funciones de retardo
 		
 
 
@@ -53,8 +55,11 @@ class gpioManager:
 		(To be developed by the student)
 	"""
 	def leds(self, num):
-		self.turnOffLeds()
-		GPIO.output(self.ledsRight[num-1], GPIO.HIGH)
+		#Si el led està apagado lo prende, si està prendido lo apaga.
+		if GPIO.input(self.ledsRight[num-1]) == 0:
+			GPIO.output(self.ledsRight[num-1], GPIO.HIGH)
+		else:
+			GPIO.output(self.ledsRight[num-1], GPIO.LOW)
 		#Para que no se siga llamando a la función.
 		self.functionName = None
 		self.functionArgument = None
@@ -65,6 +70,7 @@ class gpioManager:
 		(To be developed by the student)
 	"""
 	def bcd(self, num):
+		self.bcdValue = num
 		GPIO.output(36, GPIO.HIGH if (num & 0x00000001) > 0 else GPIO.LOW )
 		GPIO.output(38, GPIO.HIGH if (num & 0x00000002) > 0 else GPIO.LOW )
 		GPIO.output(40, GPIO.HIGH if (num & 0x00000004) > 0 else GPIO.LOW )
@@ -131,10 +137,28 @@ class gpioManager:
 		for pin in self.pinesBcd:
 			GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
 
+	def getStatus(self):
+		if self.functionName == "marquee":
+			ledAnimation = "marquee"
+			ledStatus = self.functionArgument
+		else:
+			ledAnimation = "None"
+			ledStatus = ""
+			for led in self.ledsRight:
+				ledStatus += str(GPIO.input(led))
+		data = {
+			'led_animation' : ledAnimation,
+			'led_status'		: ledStatus,
+			'bcd'						: self.bcdValue,
+			'speed'					: self.speed
+		}
+		return data
+
+
 # manager = gpioManager()
-# manager.functionName = "marquee"
-# manager.functionArgument= "pingpong"
-# manager.mainLoop()
-
-
+# manager.configureGPIO()
+# manager.leds(1)
+# manager.checkLedStatus(0)
+# manager.leds(1)
+# manager.checkLedStatus(0)
 	
