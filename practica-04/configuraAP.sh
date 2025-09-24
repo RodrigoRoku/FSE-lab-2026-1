@@ -21,15 +21,15 @@ fi
 
 if ! dpkg -s dnsmasq &> /dev/null; then
   echo "dnsmasq no està instalado, instalando"
-  #apt install -y dnsmasq
+  apt install -y dnsmasq
 else
   echo "OK dnsmas instalado"
 fi
 
 systemctl stop dnsmasq
 
-#cd /etc
-cd /home/rodrigo/Documents/Embebidos
+cd /etc
+#cd /home/rodrigo/Documents/Embebidos
 #crear backup del archivo si no existe
 if ! [ -f "dnsmasq.conf.bak" ]; then
   mv dnsmasq.conf dnsmasq.conf.bak
@@ -48,8 +48,8 @@ if ! [ -d ${DHCP_DIR} ]; then
   exit 1
 fi
 
-#cd $DHCP_DIR
-cd /home/rodrigo/Documents/Embebidos
+cd $DHCP_DIR
+#cd /home/rodrigo/Documents/Embebidos
 
 echo "[main]
 dhcp=dhcpcd" > dhcp.conf
