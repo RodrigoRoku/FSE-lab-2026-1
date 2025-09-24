@@ -58,10 +58,12 @@ class WebServer(BaseHTTPRequestHandler):
 	def _parse_post(self, json_obj):
 		if not 'action' in json_obj or not 'value' in json_obj:
 			return
-
-		controladorDelGpio.functionName = json_obj['action']
-		controladorDelGpio.functionArgument = json_obj['value']
-		controladorDelGpio.continueFunctionLoop = False #Para detener cualquier bucle infinito
+		if json_obj['action'] == "speed":
+				controladorDelGpio.speed = int(json_obj['value'])/1000
+		else:
+			controladorDelGpio.functionName = json_obj['action']
+			controladorDelGpio.functionArgument = json_obj['value']
+			controladorDelGpio.continueFunctionLoop = False #Para detener cualquier bucle infinito
 			
 
 
