@@ -19,7 +19,8 @@ import threading
 
 # Nombre o dirección IP del sistema anfitrión del servidor web
 #address = "localhost"
-address = "192.168.1.254"
+#address = "192.168.1.254"
+address = "192.168.100.46"
 # Puerto en el cual el servidor estará atendiendo solicitudes HTTP
 # El default de un servidor web en produción debe ser 80
 port = 80
@@ -77,15 +78,25 @@ class WebServer(BaseHTTPRequestHandler):
 			# La cabecera HTTP siempre debe contener el tipo de datos mime
 			# del contenido con el que responde el servidor
 			self.send_header("Content-type", "text/html")
+			self.send_header("Access-Control-Allow-Origin", "*")
 			# Fin de cabecera
 			self.end_headers()
 			# Por simplicidad, se devuelve como respuesta el contenido del
 			# archivo html con el código de la página de interfaz de usuario
 			self._serve_ui_file()
 		# En caso contrario, se verifica que el archivo exista y se sirve
+		elif self.path == '/state':
+			self.send_response(200)
+			
+			self.send_header("Content-type", "application/json")
+			self.send_header("Access-Control-Allow-Origin", "*")
+			self.end_headers()
+
+			data = controladorDelGpio.getStatus()
+			json_response = json.dumps(data)
+			self.wfile.write(json_response.encode('utf-8'))
 		else:
 			self._serve_file(self.path[1:])
-
 
 
 	"""do_POST controla todas las solicitudes recibidas vía POST, es
