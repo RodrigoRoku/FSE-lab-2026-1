@@ -4,10 +4,12 @@ echo "Primer argumento {$1}"
 echo "Segundo argumento {$2}"
 
 if [ -z "${1}" ] || [ -z "${2}" ]; then
-  echo "La función requiere de dos parámetros"
-  echo "1) SSID de la red"
-  echo "2) Password"
-  exit
+  echo "Usando valores de SSID y contraseña por default"
+  SSID="RaspberryAP_TapiaHernandez"
+  PASSWORD="12345678"
+else
+  SSID=$1
+  PASSWORD=$2
 fi
 
 USER="$(whoami)"
@@ -23,14 +25,14 @@ if ! dpkg -s dnsmasq &> /dev/null; then
   echo "dnsmasq no està instalado, instalando"
   apt install -y dnsmasq
 else
-  echo "OK dnsmas instalado"
+  echo "OK dnsmasq instalado"
 fi
 
 systemctl stop dnsmasq
 
 cd /etc
 #cd /home/rodrigo/Documents/Embebidos
-#crear backup del archivo si no existe
+#crear backup del archivo sino existe
 if ! [ -f "dnsmasq.conf.bak" ]; then
   mv dnsmasq.conf dnsmasq.conf.bak
 fi
@@ -54,7 +56,7 @@ cd $DHCP_DIR
 echo "[main]
 dhcp=dhcpcd" > dhcp.conf
 
-nmcli device wifi hotspot con-name AccessPoint ssid ${1} band bg password ${2} 
+nmcli device wifi hotspot con-name AccessPoint ssid ${SSID} band bg password ${PASSWORD} 
 
 nmcli connection modify "AccessPoint" ipv4.addresses "192.168.1.254/24" \
 ipv4.gateway "192.168.1.254" ipv4.method manual ipv6.method disabled
