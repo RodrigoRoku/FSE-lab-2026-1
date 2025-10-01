@@ -1,14 +1,14 @@
 #!/bin/python3
 #
-# kyosk.py
+# minikiosk.py
 #
-# Author:  Mauricio Matamoros
-# Date:    2023.02.14
-# License: MIT
+# # Autor: Tapia Navarro Rodrigo y Hernández Alejo Ximena Gizell
+# Date:    2025.09.23
 #
-# Plays a video file using VLC with the Raspberry Pi
+# Reproduce un video na serie de imagenes en bucle de una carpeta predetermindada.
+# Cuando detecta una USB reproduce las imàgenes de la USB usando VLC.
 #
-#GIzell dice que lo hagamos con hilos ñiñiñi
+
 import vlc
 import os
 import pyudev
@@ -20,19 +20,16 @@ swapPlaylist = False
 currentPlaylist = None
 externalImages = []
 
+
 player = vlc.MediaPlayer()
-# defaulFiles = [
-# 	'/home/pi/pictures/pic01.jpg',
-# 	'/home/pi/pictures/pic02.jpg',
-# 	'/home/pi/pictures/pic03.jpg',
-# 	'/home/pi/pictures/pic04.jpg'
-# ]
+#player.set_fullscreen(True)
 defaulFiles = [
-	'/home/rodrigo/Pictures/prueba/pic01.jpg',
-	'/home/rodrigo/Pictures/prueba/pic02.jpg',
-	'/home/rodrigo/Pictures/prueba/pic03.jpg',
-	'/home/rodrigo/Pictures/prueba/pic04.jpg'
+	'/home/pi/pictures/pic01.jpg',
+	'/home/pi/pictures/pic02.jpg',
+	'/home/pi/pictures/pic03.jpg',
+	'/home/pi/pictures/pic04.jpg'
 ]
+
 defaultImagenes = []
 for file in defaulFiles:
 	defaultImagenes.append(vlc.Media(file))
@@ -43,6 +40,11 @@ monitor = pyudev.Monitor.from_netlink(context)
 monitor.filter_by(subsystem="block", device_type="partition")
 
 def show_images():
+	player = vlc.MediaPlayer()
+	video = vlc.Media('/home/pi/videos/video.mp4')
+	player.set_media(video)
+	player.play()
+	sleep(10)
 	i=0
 	global swapPlaylist
 	while True:

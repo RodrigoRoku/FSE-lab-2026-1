@@ -1,19 +1,18 @@
 #!/bin/python3
 #
-# kyosk.py
+# minikiosk.py
 #
-# Author:  Mauricio Matamoros
-# Date:    2023.02.14
-# License: MIT
+# # Autor: Tapia Navarro Rodrigo y Hernández Alejo Ximena Gizell
+# Date:    2025.09.23
 #
-# Plays a video file using VLC with the Raspberry Pi
+# Reproduce un video 20 segundos, incrementa y decrementa el volumen gradualemte.
 #
 import vlc
 from time import sleep
 import  os
 
 player = vlc.MediaPlayer()
-video = vlc.Media('/home/ximena/Downloads/FSEm - practica 05/pi/videos/video.mp4')
+video = vlc.Media('/home/pi/videos/video.mp4')
 player.set_media(video)
 player.play()
 

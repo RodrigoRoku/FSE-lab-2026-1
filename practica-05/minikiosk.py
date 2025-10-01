@@ -1,12 +1,11 @@
 #!/bin/python3
 #
-# kyosk.py
+# minikiosk.py
 #
-# Author:  Mauricio Matamoros
-# Date:    2023.02.14
-# License: MIT
+# # Autor: Tapia Navarro Rodrigo y Hernández Alejo Ximena Gizell
+# Date:    2025.09.23
 #
-# Plays a video file using VLC with the Raspberry Pi
+# Reproduce un video durante 10 segundos luego una serie de imagenes en bucle usando VLC.
 #
 
 import vlc
