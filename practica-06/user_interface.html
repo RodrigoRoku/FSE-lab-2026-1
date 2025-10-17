@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gráfico de Temperaturas</title>
+  <!-- Carga Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f9fc;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #87cefa; /* azul claro */
+      color: #fff;
+      text-align: center;
+      padding: 15px 0;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    .chart-container {
+      width: 80%;
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <header> Gráfico de temperaturas </header>
+
+  <div class="chart-container">
+    <canvas id="graficoTemperatura"></canvas>
+  </div>
+
+  <script>
+
+
+    // // === 2. Datos de prueba iniciales ===
+    var tiempos = [];
+    var temperaturas = [];
+
+    const ctx = document.getElementById('graficoTemperatura').getContext('2d');
+    const graficoTemperatura = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: tiempos,
+        datasets: [{
+          label: 'Temperatura (°C)',
+          data: temperaturas,
+          borderColor: '#007BFF',
+          backgroundColor: 'rgba(0, 123, 255, 0.2)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 4,
+          pointBackgroundColor: '#007BFF'
+        }]
+      },
+      options: {
+        responsive: true,
+        animation: false,
+        scales: {
+          y: {
+            min: 0,
+            max: 50,
+            title: {
+              display: true,
+              text: 'Temperatura (°C)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Hora'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            labels: { font: { size: 14 } }
+          }
+        }
+      }
+    });
+
+    
+  async function pollState(){
+    try {
+      let r = await fetch('http://192.168.100.46:80/read');
+      if (!r.ok) return;
+      let s =  await r.json();
+      // console.log(s.tiempos)
+      // console.log(s.temperaturas)
+      graficoTemperatura.data.labels = s.tiempos;
+      graficoTemperatura.data.datasets[0].data = s.temperaturas
+      graficoTemperatura.update();
+      // updateUI(s);
+    } catch(e){
+      console.debug("poll error", e);
+    }
+  }
+    function updatePlot(tiempos, temperaturas) {
+
+      // Agrega nuevo valor
+      graficoTemperatura.data.labels.push(tiempo);
+      graficoTemperatura.data.datasets[0].data.push(nuevaTemp);
+
+      // Mantén solo las últimas 30 lecturas (30 minutos)
+      if (graficoTemperatura.data.labels.length > 30) {
+        graficoTemperatura.data.labels.shift();
+        graficoTemperatura.data.datasets[0].data.shift();
+      }
+
+      graficoTemperatura.update();
+    }
+
+    // === 5. Simulación: actualiza cada minuto ===
+    // Para pruebas rápidas, puedes cambiar 60000 por 5000 (5 segundos)
+    //setInterval(agregarNuevaLectura, 5000);
+
+    // Agrega la primera lectura simulada al cargar
+    //agregarNuevaLectura()
+
+    setInterval(pollState, 1000)
+
+    pollState()
+		//Carga las ultimas 20 lecturas de la bitàcora
+
+		//Cada minuto actualiza con las últimas lecturas
+  </script>
+
+</body>
+</html>
